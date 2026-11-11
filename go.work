@@ -1,0 +1,10 @@
+go 1.27.2
+
+use (
+	.
+	./resumeee-api
+	./resumeee-auth-firebase
+	./resumeee-core
+	./resumeee-mcp
+	./resumeee-storage-sql
+)

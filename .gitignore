@@ -1,0 +1,29 @@
+# Binaries
+bin/
+dist/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+/resumeee
+
+# Test artifacts
+*.out
+coverage.html
+
+# Local data & environment
+.env
+*.db
+*.sqlite
+data/
+resumeee-data/
+ollama-data/
+
+# Sub-repositories cloned or symlinked locally for development
+resumeee-core
+resumeee-storage-sql
+resumeee-auth-firebase
+resumeee-api
+resumeee-mcp
+resumeee-web

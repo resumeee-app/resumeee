@@ -1,0 +1,66 @@
+# Resumeee — Local Development Multi-Container Composition
+# Builds containers directly from local child repository checkouts.
+#
+# Prerequisite:
+#   Run ./scripts/clone-all.sh to link or clone child repositories first.
+#
+# Launch:
+#   docker compose -f docker-compose.dev.yml up --build
+
+services:
+  api:
+    build:
+      context: ./resumeee-api
+      dockerfile: Dockerfile
+    image: resumeee-api:dev
+    container_name: resumeee-api-dev
+    restart: unless-stopped
+    ports:
+      - "${API_PORT:-8080}:8080"
+    environment:
+      - PORT=8080
+      - DB_PATH=/data/resumeee.db
+      - ADMIN_MODE=true
+      - DEFAULT_USER_ID=default
+      - ENV=development
+      - LOG_LEVEL=DEBUG
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+    volumes:
+      - dev-data:/data
+    networks:
+      - resumeee-dev-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/v1/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+      start_period: 3s
+
+  web:
+    build:
+      context: ./resumeee-web
+      dockerfile: Dockerfile
+    image: resumeee-web:dev
+    container_name: resumeee-web-dev
+    restart: unless-stopped
+    ports:
+      - "${WEB_PORT:-3000}:80"
+    environment:
+      - VITE_API_BASE_URL=/api/v1
+      - ADMIN_MODE=true
+    networks:
+      - resumeee-dev-net
+    depends_on:
+      api:
+        condition: service_healthy
+
+volumes:
+  dev-data:
+    name: resumeee-dev-data
+
+networks:
+  resumeee-dev-net:
+    name: resumeee-dev-net
+    driver: bridge
