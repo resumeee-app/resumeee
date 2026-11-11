@@ -25,11 +25,14 @@ dev-down:
 clone:
 	./scripts/clone-all.sh
 
+test:
+	GOWORK=off go test -race ./cmd/resumeee/...
+
 test-all:
 	go test -race ./...
 
 build-all:
-	go build -o bin/resumeee ./cmd/resumeee
+	GOWORK=off go build -o bin/resumeee ./cmd/resumeee
 
 clean:
 	rm -rf bin/
