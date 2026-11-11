@@ -55,6 +55,9 @@ func TestCLI_PrintVersion(t *testing.T) {
 	if info.Ecosystem["resumeee-core"] != "github.com/resumeee-app/resumeee-core" {
 		t.Errorf("missing or incorrect resumeee-core mapping in ecosystem")
 	}
+	if info.Ecosystem["resumeee-llm"] != "github.com/resumeee-app/resumeee-llm" {
+		t.Errorf("missing or incorrect resumeee-llm mapping in ecosystem")
+	}
 	if info.Ecosystem["resumeee-web"] != "github.com/resumeee-app/resumeee-web" {
 		t.Errorf("missing or incorrect resumeee-web mapping in ecosystem")
 	}

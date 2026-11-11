@@ -112,10 +112,10 @@ func printVersion(w io.Writer) error {
 		BuildDate: BuildDate,
 		Ecosystem: map[string]string{
 			"resumeee-core":          "github.com/resumeee-app/resumeee-core",
+			"resumeee-llm":           "github.com/resumeee-app/resumeee-llm",
 			"resumeee-storage-sql":   "github.com/resumeee-app/resumeee-storage-sql",
 			"resumeee-auth-firebase": "github.com/resumeee-app/resumeee-auth-firebase",
 			"resumeee-api":           "github.com/resumeee-app/resumeee-api",
-			"resumeee-mcp":           "github.com/resumeee-app/resumeee-mcp",
 			"resumeee-web":           "github.com/resumeee-app/resumeee-web",
 		},
 	}

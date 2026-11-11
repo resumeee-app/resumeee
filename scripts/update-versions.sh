@@ -10,10 +10,10 @@ echo "=== Resumeee Module Version Audit ==="
 
 REPOS=(
   "resumeee-core"
+  "resumeee-llm"
   "resumeee-storage-sql"
   "resumeee-auth-firebase"
   "resumeee-api"
-  "resumeee-mcp"
 )
 
 for repo in "${REPOS[@]}"; do

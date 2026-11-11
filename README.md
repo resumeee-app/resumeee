@@ -67,11 +67,11 @@ Resumeee is organized across six decoupled, contract-governed repositories under
 
 | Repository | Role & Layer | Tech Stack |
 | :--- | :--- | :--- |
-| [**`resumeee-core`**](https://github.com/resumeee-app/resumeee-core) | Pure domain contracts, entities, validators, privacy filters, and business services | Go (Zero ORM/DB dependencies) |
+| [**`resumeee-core`**](https://github.com/resumeee-app/resumeee-core) | Pure domain entities, validators, PII obfuscation, prompt compiler, LLM schemas, worker pool, and business services | Go (Zero ORM/HTTP SDK dependencies) |
+| [**`resumeee-llm`**](https://github.com/resumeee-app/resumeee-llm) | Pure transport LLM provider adapters (Gemini, OpenAI, Anthropic, Ollama/Compat) implementing `domain.LLMClient` | Go, HTTP Transport |
 | [**`resumeee-storage-sql`**](https://github.com/resumeee-app/resumeee-storage-sql) | Dialect-agnostic SQL storage adapter with TLS enforcement and DSN sanitization | Go, GORM, SQLite, PostgreSQL, MySQL |
 | [**`resumeee-auth-firebase`**](https://github.com/resumeee-app/resumeee-auth-firebase) | RS256 token verification adapter with fail-closed key caching and dev verifier | Go, Google JWKS, RS256 |
-| [**`resumeee-api`**](https://github.com/resumeee-app/resumeee-api) | HTTP REST server, background worker pool, LLM tailoring engine, and PDF parser | Go, OpenAPI 3.1, Multi-LLM |
-| [**`resumeee-mcp`**](https://github.com/resumeee-app/resumeee-mcp) | Standalone Model Context Protocol server (stdio & SSE) for Claude Desktop, Cursor, Antigravity | Go, MCP Protocol SDK |
+| [**`resumeee-api`**](https://github.com/resumeee-app/resumeee-api) | Unified HTTP REST server (`/api/v1/*`) and Model Context Protocol server (`cmd/mcp`, `/mcp/*`) | Go, OpenAPI 3.1, MCP Protocol SDK |
 | [**`resumeee-web`**](https://github.com/resumeee-app/resumeee-web) | Pure client-side Single-Page Application (Zero SSR) deployed to object storage & CDN | React 18, Vite, Radix UI, TypeScript |
 
 ---

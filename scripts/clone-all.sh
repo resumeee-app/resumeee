@@ -10,10 +10,10 @@ ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
 REPOS=(
   "resumeee-core"
+  "resumeee-llm"
   "resumeee-storage-sql"
   "resumeee-auth-firebase"
   "resumeee-api"
-  "resumeee-mcp"
   "resumeee-web"
 )
 

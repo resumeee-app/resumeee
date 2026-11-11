@@ -22,8 +22,8 @@ ollama-data/
 
 # Sub-repositories cloned or symlinked locally for development
 resumeee-core
+resumeee-llm
 resumeee-storage-sql
 resumeee-auth-firebase
 resumeee-api
-resumeee-mcp
 resumeee-web
