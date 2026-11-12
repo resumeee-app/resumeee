@@ -1,66 +1,62 @@
-# Resumeee — Local Development Multi-Container Composition
-# Builds containers directly from local child repository checkouts.
-#
-# Prerequisite:
-#   Run ./scripts/clone-all.sh to link or clone child repositories first.
-#
-# Launch:
-#   docker compose -f docker-compose.dev.yml up --build
+# Dev override with live reload across all Go workspace modules (air) and React SPA (Vite HMR).
+# Usage:
+#   DEV_UID=$(id -u) DEV_GID=$(id -g) docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+#   or simply: make dev
 
 services:
-  api:
+  server:
+    image: resumeee-dev:latest
     build:
-      context: ./resumeee-api
-      dockerfile: Dockerfile
-    image: resumeee-api:dev
-    container_name: resumeee-api-dev
-    restart: unless-stopped
-    ports:
-      - "${API_PORT:-8080}:8080"
+      context: .
+      dockerfile: Dockerfile.dev
+      additional_contexts: !reset {}
+    user: "${DEV_UID:-1000}:${DEV_GID:-1000}"
+    restart: "no"
+    command: ["air", "-c", "/workspace/.air.server.toml"]
     environment:
-      - PORT=8080
-      - DB_PATH=/data/resumeee.db
-      - ADMIN_MODE=true
-      - DEFAULT_USER_ID=default
       - ENV=development
       - LOG_LEVEL=DEBUG
-      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
-      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
-      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - GOWORK=/workspace/go.work
     volumes:
-      - dev-data:/data
-    networks:
-      - resumeee-dev-net
+      - ./go.work:/workspace/go.work:ro
+      - ./.air.server.toml:/workspace/.air.server.toml:ro
+      - ./resumeee-core:/workspace/resumeee-core
+      - ./resumeee-storage-sql:/workspace/resumeee-storage-sql
+      - ./resumeee-auth-firebase:/workspace/resumeee-auth-firebase
+      - ./resumeee-api:/workspace/resumeee-api
+      - go-mod-cache:/go
+      - go-build-cache:/gocache
+      - ./data:/data
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/api/v1/health"]
-      interval: 5s
-      timeout: 3s
-      retries: 3
-      start_period: 3s
+      start_period: 90s
 
   web:
     build:
       context: ./resumeee-web
-      dockerfile: Dockerfile
-    image: resumeee-web:dev
+      dockerfile: Dockerfile.dev
+      args: !reset {}
+    image: resumeee-web-dev:latest
     container_name: resumeee-web-dev
-    restart: unless-stopped
-    ports:
-      - "${WEB_PORT:-3000}:80"
+    restart: "no"
+    ports: !override
+      - "${VITE_PORT:-5173}:5173"
     environment:
       - VITE_API_BASE_URL=/api/v1
-      - ADMIN_MODE=true
+      - VITE_API_PROXY_TARGET=http://server:8080
+      - ADMIN_MODE=${ADMIN_MODE:-true}
+      - FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID:-}
+      - FIREBASE_API_KEY=${FIREBASE_API_KEY:-}
+      - FIREBASE_AUTH_DOMAIN=${FIREBASE_AUTH_DOMAIN:-}
+    volumes:
+      - ./resumeee-web:/app
+      - web-node-modules:/app/node_modules
     networks:
-      - resumeee-dev-net
+      - resumeee-net
     depends_on:
-      api:
-        condition: service_healthy
+      server:
+        condition: service_started
 
 volumes:
-  dev-data:
-    name: resumeee-dev-data
-
-networks:
-  resumeee-dev-net:
-    name: resumeee-dev-net
-    driver: bridge
+  go-mod-cache:
+  go-build-cache:
+  web-node-modules:

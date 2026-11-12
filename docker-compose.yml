@@ -1,28 +1,36 @@
-# Resumeee — Production Multi-Container Composition
-# Spins up the complete Resumeee stack with API server, Single-Page Application, and PostgreSQL.
+# Resumeee — Full-Stack Multi-Container Composition
+# Builds and launches the unified Go API & MCP server, React Web SPA, and optional local Ollama LLM runtime.
+#
+# Prerequisite:
+#   Run ./scripts/clone-all.sh (or `make clone`) to ensure child repositories are present.
 #
 # Quickstart:
-#   docker compose up -d
+#   docker compose up -d --build
 
 services:
-  api:
-    image: ghcr.io/resumeee-app/api:latest
-    container_name: resumeee-api
+  server:
+    build:
+      context: ./resumeee-api
+      dockerfile: Dockerfile
+      additional_contexts:
+        resumeee-core: ./resumeee-core
+        resumeee-storage-sql: ./resumeee-storage-sql
+        resumeee-auth-firebase: ./resumeee-auth-firebase
+    image: resumeee:latest
+    container_name: resumeee-server
+    command: ["server"]
     restart: unless-stopped
     ports:
-      - "${API_PORT:-8080}:8080"
+      - "${PORT:-8080}:8080"
     environment:
       - PORT=8080
-      - DB_DRIVER=postgres
-      - DB_HOST=postgres
-      - DB_PORT=5432
-      - DB_USER=${POSTGRES_USER:-resumeee}
-      - DB_PASSWORD=${POSTGRES_PASSWORD:-resumeee_secure_pass}
-      - DB_NAME=${POSTGRES_DB:-resumeee}
-      - DB_SSL_MODE=disable
-      - ADMIN_MODE=${ADMIN_MODE:-false}
+      - DB_PATH=/data/resumeee.db
+      - ADMIN_MODE=${ADMIN_MODE:-true}
+      - AUTH_PROVIDER=${AUTH_PROVIDER:-}
       - DEFAULT_USER_ID=${DEFAULT_USER_ID:-default}
       - FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID:-}
+      - FIREBASE_API_KEY=${FIREBASE_API_KEY:-}
+      - FIREBASE_AUTH_DOMAIN=${FIREBASE_AUTH_DOMAIN:-}
       - LLM_DAILY_REQUEST_LIMIT=${LLM_DAILY_REQUEST_LIMIT:-50}
       - LLM_MONTHLY_TOKEN_LIMIT=${LLM_MONTHLY_TOKEN_LIMIT:-1000000}
       - WORKER_CONCURRENCY=${WORKER_CONCURRENCY:-2}
@@ -30,16 +38,19 @@ services:
       - MAX_CONCURRENT_JOBS_PER_TENANT=${MAX_CONCURRENT_JOBS_PER_TENANT:-2}
       - ENV=${ENV:-production}
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
-      # Hosted LLM API Keys
+      - REST_TIMEOUT=${REST_TIMEOUT:-20s}
+      - LLM_TIMEOUT=${LLM_TIMEOUT:-10m}
+      - LLM_DEBUG_PROMPTS=${LLM_DEBUG_PROMPTS:-false}
+      - LLM_DEBUG_DIR=${LLM_DEBUG_DIR:-/data/llm}
+      # Hosted LLM API Keys (injected from host environment / .env)
       - GEMINI_API_KEY=${GEMINI_API_KEY:-}
       - OPENAI_API_KEY=${OPENAI_API_KEY:-}
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
-      # Local LLM / Ollama endpoint
+      # OpenAI-Compatible / Ollama endpoint
       - OPENAI_COMPAT_BASE_URL=${OPENAI_COMPAT_BASE_URL:-http://ollama:11434/v1}
       - OPENAI_COMPAT_API_KEY=${OPENAI_COMPAT_API_KEY:-ollama}
-    depends_on:
-      postgres:
-        condition: service_healthy
+    volumes:
+      - resumeee-data:/data
     networks:
       - resumeee-net
     healthcheck:
@@ -48,42 +59,37 @@ services:
       timeout: 5s
       retries: 3
       start_period: 5s
+    depends_on:
+      ollama:
+        condition: service_started
+        required: false
 
   web:
-    image: ghcr.io/resumeee-app/web:latest
+    build:
+      context: ./resumeee-web
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-/api/v1}
+        ADMIN_MODE: ${ADMIN_MODE:-true}
+        FIREBASE_PROJECT_ID: ${FIREBASE_PROJECT_ID:-}
+        FIREBASE_API_KEY: ${FIREBASE_API_KEY:-}
+        FIREBASE_AUTH_DOMAIN: ${FIREBASE_AUTH_DOMAIN:-}
+    image: resumeee-web:latest
     container_name: resumeee-web
     restart: unless-stopped
     ports:
-      - "${WEB_PORT:-3000}:80"
+      - "${WEB_PORT:-3000}:8080"
     environment:
       - VITE_API_BASE_URL=/api/v1
-      - ADMIN_MODE=${ADMIN_MODE:-false}
+      - ADMIN_MODE=${ADMIN_MODE:-true}
       - FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID:-}
+      - FIREBASE_API_KEY=${FIREBASE_API_KEY:-}
+      - FIREBASE_AUTH_DOMAIN=${FIREBASE_AUTH_DOMAIN:-}
     networks:
       - resumeee-net
     depends_on:
-      api:
+      server:
         condition: service_healthy
-
-  postgres:
-    image: postgres:16-alpine
-    container_name: resumeee-postgres
-    restart: unless-stopped
-    ports:
-      - "${POSTGRES_PORT:-5432}:5432"
-    environment:
-      - POSTGRES_USER=${POSTGRES_USER:-resumeee}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-resumeee_secure_pass}
-      - POSTGRES_DB=${POSTGRES_DB:-resumeee}
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-    networks:
-      - resumeee-net
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
 
   ollama:
     image: ollama/ollama:latest
@@ -99,10 +105,10 @@ services:
       - local-llm
 
 volumes:
-  postgres-data:
-    name: resumeee-postgres-data
+  resumeee-data:
+    name: resumeee-data
   ollama-data:
-    name: resumeee-ollama-data
+    name: ollama-data
 
 networks:
   resumeee-net:

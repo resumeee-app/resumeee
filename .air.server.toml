@@ -1,0 +1,15 @@
+root = "/workspace"
+tmp_dir = "/tmp/air-server"
+
+[build]
+  cmd = "go build -C /workspace/resumeee-api -o /tmp/air-server/app ./cmd/server"
+  bin = "/tmp/air-server/app"
+  include_ext = ["go", "html", "css", "js"]
+  exclude_dir = ["data", ".git", ".worktrees", "tmp", "resumeee-web"]
+  exclude_regex = ["_test\\.go"]
+  delay = 300
+  kill_delay = "500ms"
+  send_interrupt = true
+
+[log]
+  time = true

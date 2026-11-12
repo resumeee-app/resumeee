@@ -1,38 +1,36 @@
-.PHONY: all dev up down status logs clone test-all build-all clean
+.PHONY: clone up down status logs dev dev-down test-all
 
-all: build-all
+DEV_UID ?= $(shell id -u)
+DEV_GID ?= $(shell id -g)
 
-# Docker multi-container composition targets
-up:
-	docker compose up -d
-
-down:
-	docker compose down
-
-status:
-	docker compose ps
-
-logs:
-	docker compose logs -f
-
-dev:
-	docker compose -f docker-compose.dev.yml up --build
-
-dev-down:
-	docker compose -f docker-compose.dev.yml down
-
-# Workspace multi-module developer targets
+# Ensure all child repositories are cloned or linked into the workspace
 clone:
 	./scripts/clone-all.sh
 
-test:
-	GOWORK=off go test -race ./cmd/resumeee/...
+# Build and start full stack in detached mode (Go API/MCP server + NGINX Web SPA)
+up: clone
+	docker compose up -d --build
 
-test-all:
-	go test -race ./...
+# Stop full stack containers
+down:
+	docker compose down
 
-build-all:
-	GOWORK=off go build -o bin/resumeee ./cmd/resumeee
+# Show running container status
+status:
+	docker compose ps
 
-clean:
-	rm -rf bin/
+# Follow container logs
+logs:
+	docker compose logs -f
+
+# Run live-reload development stack (air for Go modules + Vite HMR on :5173)
+dev: clone
+	DEV_UID=$(DEV_UID) DEV_GID=$(DEV_GID) docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+
+# Stop live-reload development stack
+dev-down:
+	docker compose -f docker-compose.yml -f docker-compose.dev.yml down
+
+# Run Go tests across all workspace modules
+test-all: clone
+	go test -race ./resumeee-core/... ./resumeee-storage-sql/... ./resumeee-auth-firebase/... ./resumeee-api/...

@@ -1,104 +1,90 @@
 # Resumeee
 
-> **AI-Powered Career Profile & Targeted Resume Tailoring Engine**  
-> Flagship Distribution, Multi-Container Orchestrator & Developer Workspace Hub.
+> **Single source of truth, infinite tailored resumes.**  
+> Multi-Repository Workspace & Docker Compose Orchestrator.
 
 ---
 
 ## Overview
 
-**Resumeee** is an autonomous, contract-first platform for career management and resume tailoring. It treats candidate career histories as living graph structures, enabling job seekers to create targeted resume branches, run ATS qualification and keyword gap analysis, tailor achievements using multi-provider LLMs with strict provenance tracking, and render ATS-friendly resumes across formats.
+**Resumeee** is a self-hosted, contract-first career graph engine and interactive resume workspace. It maintains a single Master Profile and branches it into targeted, role-specific resumes across HTML, Markdown, and Plain Text formats while enforcing a strict **Provenance & Grounding Validator ("No Lies" invariant)**.
 
-This repository (**`github.com/resumeee-app/resumeee`**) serves as the **flagship distribution and orchestration hub**. It uses Docker Compose to launch all services together and provides master Go workspace orchestration (`go.work`) for contributors.
+This repository (**`github.com/resumeee-app/resumeee`**) is the top-level workspace and Docker Compose orchestrator that brings all Resumeee services up together.
 
 ---
 
-## 30-Second Quickstart (Docker Compose)
+## Ecosystem Repositories
 
-Spin up the complete Resumeee stack (API server, Single-Page Application, and PostgreSQL database) using Docker:
+| Repository | Responsibility |
+| :--- | :--- |
+| [**`resumeee-core`**](https://github.com/resumeee-app/resumeee-core) | Core domain entities, interfaces (`LLMClient`, `LLMProvider`, repositories), prompt compiler, JSON schemas, built-in LLM transport clients (Gemini, OpenAI, Anthropic, OpenAI-Compat), provenance validator, template renderer, and worker pool |
+| [**`resumeee-storage-sql`**](https://github.com/resumeee-app/resumeee-storage-sql) | SQL persistence adapter (`sqlite`, `postgres`, `dbutil`) with automatic migrations and default profile/preset/template seeding |
+| [**`resumeee-auth-firebase`**](https://github.com/resumeee-app/resumeee-auth-firebase) | Authentication provider registry, RS256 Firebase JWT verifier, and local single-user Admin Mode provider |
+| [**`resumeee-api`**](https://github.com/resumeee-app/resumeee-api) | OpenAPI 3.1 contract, HTTP REST router (`/api/v1/*`), and Model Context Protocol server (`cmd/server`, `cmd/mcp`, `/mcp/*`) |
+| [**`resumeee-web`**](https://github.com/resumeee-app/resumeee-web) | Pure client-side React 18 + Radix UI Single-Page Application (Zero SSR) |
+
+---
+
+## Quickstart (Docker Compose)
+
+### 1. Clone Child Repositories & Configure Environment
 
 ```bash
-# Clone the flagship distribution repository
-git clone https://github.com/resumeee-app/resumeee.git
-cd resumeee
+# Clone or symlink all child repositories into the workspace
+./scripts/clone-all.sh
 
-# Bring up all services with Docker Compose
-docker compose up -d
+# Create your local .env configuration
+cp .env.example .env
+# Add your GEMINI_API_KEY, OPENAI_API_KEY, or ANTHROPIC_API_KEY to .env
 ```
 
-Once running:
-- **Web User Interface**: [http://localhost:3000](http://localhost:3000)
-- **REST API & Swagger Specs**: [http://localhost:8080/api/v1/health](http://localhost:8080/api/v1/health)
-- **PostgreSQL Database**: `localhost:5432` (`resumeee` / `resumeee_secure_pass`)
+### 2. Run Full Stack (Production Containers)
 
-To shut down:
+Builds and runs the Go API/MCP server (`:8080`) with persistent SQLite storage (`resumeee-data:/data`) and the NGINX Web SPA (`:3000`):
+
+```bash
+docker compose up -d --build
+# or: make up
+```
+
+- **Web UI**: [http://localhost:3000](http://localhost:3000)
+- **REST API**: [http://localhost:8080/api/v1](http://localhost:8080/api/v1)
+- **Health Check**: `curl http://localhost:8080/api/v1/health`
+
+To stop:
 ```bash
 docker compose down
+# or: make down
+```
+
+### 3. Run Development Stack with Live Reload (`air` + Vite HMR)
+
+Runs Go live-reload (`air` watching `resumeee-core`, `resumeee-storage-sql`, `resumeee-auth-firebase`, and `resumeee-api`) alongside Vite HMR (`resumeee-web`):
+
+```bash
+DEV_UID=$(id -u) DEV_GID=$(id -g) docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+# or: make dev
+```
+
+- **Web UI (Vite HMR)**: [http://localhost:5173](http://localhost:5173)
+- **REST API (`air`)**: [http://localhost:8080/api/v1](http://localhost:8080/api/v1)
+
+### 4. Optional: Local Ollama Container (`local-llm` profile)
+
+```bash
+docker compose --profile local-llm up -d --build
+docker exec -it resumeee-ollama ollama pull llama3.3
 ```
 
 ---
 
-## Resumeee Orchestration CLI
+## Multi-Module Go Workspace (`go.work`)
 
-The flagship repository includes a lightweight CLI (`resumeee`) for managing multi-container service lifecycle:
-
-```bash
-# Build the orchestration binary
-make build-all
-
-# Launch all containerized services
-./bin/resumeee up
-
-# Check status of container fleet
-./bin/resumeee status
-
-# Stream container logs
-./bin/resumeee logs
-
-# Stop all containers
-./bin/resumeee down
-```
-
----
-
-## Ecosystem Architecture & Repositories
-
-Resumeee is organized across five decoupled, contract-governed repositories under the [`resumeee-app`](https://github.com/resumeee-app) organization:
-
-| Repository | Role & Layer | Tech Stack |
-| :--- | :--- | :--- |
-| [**`resumeee-core`**](https://github.com/resumeee-app/resumeee-core) | Pure domain entities, validators, PII obfuscation, prompt compiler, LLM schemas, injectable `LLMClient` transport providers, worker pool, and business services | Go (Zero ORM dependencies) |
-| [**`resumeee-storage-sql`**](https://github.com/resumeee-app/resumeee-storage-sql) | Dialect-agnostic SQL storage adapter with TLS enforcement and DSN sanitization | Go, GORM, SQLite, PostgreSQL, MySQL |
-| [**`resumeee-auth-firebase`**](https://github.com/resumeee-app/resumeee-auth-firebase) | RS256 token verification adapter with fail-closed key caching and dev verifier | Go, Google JWKS, RS256 |
-| [**`resumeee-api`**](https://github.com/resumeee-app/resumeee-api) | Unified HTTP REST server (`/api/v1/*`) and Model Context Protocol server (`cmd/mcp`, `/mcp/*`) | Go, OpenAPI 3.1, MCP Protocol SDK |
-| [**`resumeee-web`**](https://github.com/resumeee-app/resumeee-web) | Pure client-side Single-Page Application (Zero SSR) deployed to object storage & CDN | React 18, Vite, Radix UI, TypeScript |
-
----
-
-## Developer Workspace Setup (`go.work`)
-
-For developers contributing across multiple repositories simultaneously, this repository provides a master Go workspace:
+After running `./scripts/clone-all.sh`, `go.work` links all four Go repositories for unified local development and testing:
 
 ```bash
-# 1. Clone or symlink all child repositories into the workspace
-make clone
-# or: ./scripts/clone-all.sh
-
-# 2. Run tests across all Go repositories in the workspace
 make test-all
-
-# 3. Launch local live-reload development containers
-make dev
 ```
-
----
-
-## Deployment Templates
-
-Production deployment manifests are provided under [`deploy/`](./deploy/):
-- **Docker Compose**: [`docker-compose.yml`](./docker-compose.yml) (official multi-container production stack)
-- **Kubernetes Helm Chart**: [`deploy/helm/`](./deploy/helm/)
-- **Fly.io Manifest**: [`deploy/fly/fly.toml`](./deploy/fly/fly.toml)
 
 ---
 

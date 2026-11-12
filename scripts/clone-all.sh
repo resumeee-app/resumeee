@@ -33,7 +33,4 @@ for repo in "${REPOS[@]}"; do
   fi
 done
 
-echo "=== Syncing Go Workspace ==="
-go work sync || true
-
 echo "=== Workspace Ready ==="

@@ -1,9 +1,15 @@
 go 1.27.2
 
 use (
-	.
 	./resumeee-api
 	./resumeee-auth-firebase
 	./resumeee-core
 	./resumeee-storage-sql
+)
+
+replace (
+	github.com/resumeee-app/resumeee-auth-firebase v0.0.0-20261111075744-9c641169c615 => ./resumeee-auth-firebase
+	github.com/resumeee-app/resumeee-core v0.0.0-20261111074502-ee7edf4ad958 => ./resumeee-core
+	github.com/resumeee-app/resumeee-core v0.0.0-20261112010632-bd3416befe89 => ./resumeee-core
+	github.com/resumeee-app/resumeee-storage-sql v0.0.0-20261111075740-a74a06ae2cea => ./resumeee-storage-sql
 )
