@@ -1,4 +1,4 @@
-.PHONY: clone up down status logs dev dev-down test-all
+.PHONY: clone up down status logs dev dev-down fmt fmt-check test-all
 
 DEV_UID ?= $(shell id -u)
 DEV_GID ?= $(shell id -g)
@@ -31,6 +31,19 @@ dev: clone
 dev-down:
 	docker compose -f docker-compose.yml -f docker-compose.dev.yml down
 
-# Run Go tests across all workspace modules
-test-all: clone
+# Format all Go workspace modules with gofmt
+fmt: clone
+	gofmt -w ./resumeee-core ./resumeee-storage-sql ./resumeee-auth-firebase ./resumeee-api
+
+# Check gofmt formatting across all Go workspace modules
+fmt-check: clone
+	@unformatted=$$(gofmt -l ./resumeee-core ./resumeee-storage-sql ./resumeee-auth-firebase ./resumeee-api); \
+	if [ -n "$$unformatted" ]; then \
+		echo "The following files are not formatted with gofmt:"; \
+		echo "$$unformatted"; \
+		exit 1; \
+	fi
+
+# Run Go formatting check and tests across all workspace modules
+test-all: fmt-check
 	go test -race ./resumeee-core/... ./resumeee-storage-sql/... ./resumeee-auth-firebase/... ./resumeee-api/...
