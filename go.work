@@ -5,6 +5,5 @@ use (
 	./resumeee-api
 	./resumeee-auth-firebase
 	./resumeee-core
-	./resumeee-llm
 	./resumeee-storage-sql
 )

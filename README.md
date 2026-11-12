@@ -63,12 +63,11 @@ make build-all
 
 ## Ecosystem Architecture & Repositories
 
-Resumeee is organized across six decoupled, contract-governed repositories under the [`resumeee-app`](https://github.com/resumeee-app) organization:
+Resumeee is organized across five decoupled, contract-governed repositories under the [`resumeee-app`](https://github.com/resumeee-app) organization:
 
 | Repository | Role & Layer | Tech Stack |
 | :--- | :--- | :--- |
-| [**`resumeee-core`**](https://github.com/resumeee-app/resumeee-core) | Pure domain entities, validators, PII obfuscation, prompt compiler, LLM schemas, worker pool, and business services | Go (Zero ORM/HTTP SDK dependencies) |
-| [**`resumeee-llm`**](https://github.com/resumeee-app/resumeee-llm) | Pure transport LLM provider adapters (Gemini, OpenAI, Anthropic, Ollama/Compat) implementing `domain.LLMClient` | Go, HTTP Transport |
+| [**`resumeee-core`**](https://github.com/resumeee-app/resumeee-core) | Pure domain entities, validators, PII obfuscation, prompt compiler, LLM schemas, injectable `LLMClient` transport providers, worker pool, and business services | Go (Zero ORM dependencies) |
 | [**`resumeee-storage-sql`**](https://github.com/resumeee-app/resumeee-storage-sql) | Dialect-agnostic SQL storage adapter with TLS enforcement and DSN sanitization | Go, GORM, SQLite, PostgreSQL, MySQL |
 | [**`resumeee-auth-firebase`**](https://github.com/resumeee-app/resumeee-auth-firebase) | RS256 token verification adapter with fail-closed key caching and dev verifier | Go, Google JWKS, RS256 |
 | [**`resumeee-api`**](https://github.com/resumeee-app/resumeee-api) | Unified HTTP REST server (`/api/v1/*`) and Model Context Protocol server (`cmd/mcp`, `/mcp/*`) | Go, OpenAPI 3.1, MCP Protocol SDK |
