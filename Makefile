@@ -33,11 +33,11 @@ dev-down:
 
 # Format all Go workspace modules with gofmt
 fmt: clone
-	gofmt -w ./resumeee-core ./resumeee-storage-sql ./resumeee-auth-firebase ./resumeee-api
+	gofmt -w ./resumeee-core/ ./resumeee-storage-sql/ ./resumeee-auth-firebase/ ./resumeee-api/
 
 # Check gofmt formatting across all Go workspace modules
 fmt-check: clone
-	@unformatted=$$(gofmt -l ./resumeee-core ./resumeee-storage-sql ./resumeee-auth-firebase ./resumeee-api); \
+	@unformatted=$$(gofmt -l ./resumeee-core/ ./resumeee-storage-sql/ ./resumeee-auth-firebase/ ./resumeee-api/); \
 	if [ -n "$$unformatted" ]; then \
 		echo "The following files are not formatted with gofmt:"; \
 		echo "$$unformatted"; \
