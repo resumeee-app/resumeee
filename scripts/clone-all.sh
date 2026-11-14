@@ -35,16 +35,6 @@ done
 
 # Regenerate go.work with exact pseudo-version replacements so offline/containerized
 # Go builds resolve private sibling modules from the workspace without network access.
-if command -v go >/dev/null 2>&1; then
-  rm -f go.work
-  go work init ./resumeee-api ./resumeee-auth-firebase ./resumeee-core ./resumeee-storage-sql
-  grep -h -o -E 'github\.com/resumeee-app/resumeee-(core|storage-sql|auth-firebase) v[^ ]+' \
-    resumeee-api/go.mod resumeee-storage-sql/go.mod resumeee-auth-firebase/go.mod 2>/dev/null \
-    | sort -u \
-    | while read -r mod ver; do
-        dir="${mod##*/}"
-        go work edit -replace "${mod}@${ver}=./${dir}"
-      done
-fi
+"${SCRIPT_DIR}/sync-go-work.sh"
 
 echo "=== Workspace Ready ==="

@@ -11,7 +11,7 @@ replace github.com/resumeee-app/resumeee-auth-firebase v0.0.0-20261112064701-762
 
 replace (
 	github.com/resumeee-app/resumeee-core v0.0.0-20261112064600-8a4aa3c5d154 => ./resumeee-core
-	github.com/resumeee-app/resumeee-core v0.0.0-20261112065925-edd01cbb066c => ./resumeee-core
+	github.com/resumeee-app/resumeee-core v0.0.0-20261114060124-26f4e04b441f => ./resumeee-core
 )
 
 replace github.com/resumeee-app/resumeee-storage-sql v0.0.0-20261112064743-dbcc6b8081d0 => ./resumeee-storage-sql

@@ -1,4 +1,4 @@
-.PHONY: clone up down status logs dev dev-down fmt fmt-check test-all
+.PHONY: clone update up down status logs dev dev-down fmt fmt-check test-all
 
 DEV_UID ?= $(shell id -u)
 DEV_GID ?= $(shell id -g)
@@ -6,6 +6,10 @@ DEV_GID ?= $(shell id -g)
 # Ensure all child repositories are cloned or linked into the workspace
 clone:
 	./scripts/clone-all.sh
+
+# Fetch and fast-forward all child repositories to the latest main
+update: clone
+	./scripts/update-all.sh
 
 # Build and start full stack in detached mode (Go API/MCP server + NGINX Web SPA)
 up: clone
