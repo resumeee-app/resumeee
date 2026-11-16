@@ -13,7 +13,7 @@ services:
       context: ./resumeee-api
       dockerfile: Dockerfile
       additional_contexts:
-        resumeee-core: ./resumeee-core
+        core: ./core
         resumeee-storage-sql: ./resumeee-storage-sql
         resumeee-auth-firebase: ./resumeee-auth-firebase
     image: resumeee:latest

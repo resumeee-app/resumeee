@@ -20,7 +20,7 @@ services:
     volumes:
       - ./go.work:/workspace/go.work:ro
       - ./.air.server.toml:/workspace/.air.server.toml:ro
-      - ./resumeee-core:/workspace/resumeee-core
+      - ./core:/workspace/core
       - ./resumeee-storage-sql:/workspace/resumeee-storage-sql
       - ./resumeee-auth-firebase:/workspace/resumeee-auth-firebase
       - ./resumeee-api:/workspace/resumeee-api
