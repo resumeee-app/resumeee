@@ -10,7 +10,7 @@ data/
 coverage.out
 .env
 core
-resumeee-storage-sql
+sql
 resumeee-auth-firebase
 server
 resumeee-web

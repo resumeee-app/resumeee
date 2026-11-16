@@ -1,8 +1,8 @@
 # Child repositories (cloned or symlinked via scripts/clone-all.sh)
 core/
 core
-resumeee-storage-sql/
-resumeee-storage-sql
+sql/
+sql
 resumeee-auth-firebase/
 resumeee-auth-firebase
 server/
