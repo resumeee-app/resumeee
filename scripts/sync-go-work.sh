@@ -11,9 +11,9 @@ cd "${ROOT_DIR}"
 
 if command -v go >/dev/null 2>&1; then
   rm -f go.work
-  go work init ./server ./resumeee-auth-firebase ./core ./sql
-  grep -h -o -E 'github\.com/resumeee-app/(core|sql|resumeee-auth-firebase) v[^ ]+' \
-    server/go.mod sql/go.mod resumeee-auth-firebase/go.mod 2>/dev/null \
+  go work init ./server ./core ./sql
+  grep -h -o -E 'github\.com/resumeee-app/(core|sql) v[^ ]+' \
+    server/go.mod sql/go.mod 2>/dev/null \
     | sort -u \
     | while read -r mod ver; do
         dir="${mod##*/}"

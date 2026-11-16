@@ -22,7 +22,6 @@ services:
       - ./.air.server.toml:/workspace/.air.server.toml:ro
       - ./core:/workspace/core
       - ./sql:/workspace/sql
-      - ./resumeee-auth-firebase:/workspace/resumeee-auth-firebase
       - ./server:/workspace/server
       - go-mod-cache:/go
       - go-build-cache:/gocache
@@ -44,9 +43,6 @@ services:
       - VITE_API_BASE_URL=/api/v1
       - VITE_API_PROXY_TARGET=http://server:8080
       - ADMIN_MODE=${ADMIN_MODE:-true}
-      - FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID:-}
-      - FIREBASE_API_KEY=${FIREBASE_API_KEY:-}
-      - FIREBASE_AUTH_DOMAIN=${FIREBASE_AUTH_DOMAIN:-}
     volumes:
       - ./web:/app
       - web-node-modules:/app/node_modules

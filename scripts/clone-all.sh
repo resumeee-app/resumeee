@@ -11,7 +11,6 @@ ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 REPOS=(
   "core"
   "sql"
-  "resumeee-auth-firebase"
   "server"
   "web"
 )

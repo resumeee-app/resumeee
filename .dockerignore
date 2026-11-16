@@ -11,6 +11,5 @@ coverage.out
 .env
 core
 sql
-resumeee-auth-firebase
 server
 web
