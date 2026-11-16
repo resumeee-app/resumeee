@@ -2,9 +2,9 @@ go 1.27.2
 
 use (
 	./core
-	./resumeee-api
 	./resumeee-auth-firebase
 	./resumeee-storage-sql
+	./server
 )
 
 replace github.com/resumeee-app/core v0.0.0-20261116055334-268b7be87011 => ./core

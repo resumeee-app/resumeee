@@ -2,7 +2,7 @@ root = "/workspace"
 tmp_dir = "/tmp/air-server"
 
 [build]
-  cmd = "go build -C /workspace/resumeee-api -o /tmp/air-server/app ./cmd/server"
+  cmd = "go build -C /workspace/server -o /tmp/air-server/app ./cmd/server"
   bin = "/tmp/air-server/app"
   include_ext = ["go", "html", "css", "js"]
   exclude_dir = ["data", ".git", ".worktrees", "tmp", "resumeee-web"]

@@ -10,7 +10,7 @@ REPOS=(
   "core"
   "resumeee-storage-sql"
   "resumeee-auth-firebase"
-  "resumeee-api"
+  "server"
   "resumeee-web"
 )
 
