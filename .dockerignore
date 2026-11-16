@@ -9,7 +9,7 @@ data/
 *.db-shm
 coverage.out
 .env
-resumeee-core
+core
 resumeee-storage-sql
 resumeee-auth-firebase
 resumeee-api
