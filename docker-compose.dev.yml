@@ -32,7 +32,7 @@ services:
 
   web:
     build:
-      context: ./resumeee-web
+      context: ./web
       dockerfile: Dockerfile.dev
       args: !reset {}
     image: resumeee-web-dev:latest
@@ -48,7 +48,7 @@ services:
       - FIREBASE_API_KEY=${FIREBASE_API_KEY:-}
       - FIREBASE_AUTH_DOMAIN=${FIREBASE_AUTH_DOMAIN:-}
     volumes:
-      - ./resumeee-web:/app
+      - ./web:/app
       - web-node-modules:/app/node_modules
     networks:
       - resumeee-net

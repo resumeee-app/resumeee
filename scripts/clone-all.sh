@@ -13,7 +13,7 @@ REPOS=(
   "sql"
   "resumeee-auth-firebase"
   "server"
-  "resumeee-web"
+  "web"
 )
 
 BASE_URL="https://github.com/resumeee-app"

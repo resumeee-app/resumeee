@@ -11,7 +11,7 @@ REPOS=(
   "sql"
   "resumeee-auth-firebase"
   "server"
-  "resumeee-web"
+  "web"
 )
 
 echo "=== Updating Resumeee Subrepositories ==="
