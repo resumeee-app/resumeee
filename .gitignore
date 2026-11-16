@@ -7,8 +7,8 @@ resumeee-auth-firebase/
 resumeee-auth-firebase
 server/
 server
-resumeee-web/
-resumeee-web
+web/
+web
 
 # Build artifacts & local runtime data
 bin/

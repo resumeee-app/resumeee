@@ -21,7 +21,7 @@ This repository (**`github.com/resumeee-app/resumeee`**) is the top-level worksp
 | [**`sql`**](https://github.com/resumeee-app/sql) | SQL persistence adapter (`sqlite`, `postgres`, `dbutil`) with automatic migrations and default profile/preset/template seeding |
 | [**`resumeee-auth-firebase`**](https://github.com/resumeee-app/resumeee-auth-firebase) | Authentication provider registry, RS256 Firebase JWT verifier, and local single-user Admin Mode provider |
 | [**`server`**](https://github.com/resumeee-app/server) | OpenAPI 3.1 contract, HTTP REST router (`/api/v1/*`), and Model Context Protocol server (`cmd/server`, `cmd/mcp`, `/mcp/*`) |
-| [**`resumeee-web`**](https://github.com/resumeee-app/resumeee-web) | Pure client-side React 18 + Radix UI Single-Page Application (Zero SSR) |
+| [**`web`**](https://github.com/resumeee-app/web) | Pure client-side React 18 + Radix UI Single-Page Application (Zero SSR) |
 
 ---
 
@@ -59,7 +59,7 @@ docker compose down
 
 ### 3. Run Development Stack with Live Reload (`air` + Vite HMR)
 
-Runs Go live-reload (`air` watching `core`, `sql`, `resumeee-auth-firebase`, and `server`) alongside Vite HMR (`resumeee-web`):
+Runs Go live-reload (`air` watching `core`, `sql`, `resumeee-auth-firebase`, and `server`) alongside Vite HMR (`web`):
 
 ```bash
 DEV_UID=$(id -u) DEV_GID=$(id -g) docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
