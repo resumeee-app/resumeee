@@ -23,7 +23,7 @@ services:
       - ./core:/workspace/core
       - ./resumeee-storage-sql:/workspace/resumeee-storage-sql
       - ./resumeee-auth-firebase:/workspace/resumeee-auth-firebase
-      - ./resumeee-api:/workspace/resumeee-api
+      - ./server:/workspace/server
       - go-mod-cache:/go
       - go-build-cache:/gocache
       - ./data:/data

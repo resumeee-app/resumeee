@@ -10,7 +10,7 @@
 services:
   server:
     build:
-      context: ./resumeee-api
+      context: ./server
       dockerfile: Dockerfile
       additional_contexts:
         core: ./core

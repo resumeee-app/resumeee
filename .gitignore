@@ -5,8 +5,8 @@ resumeee-storage-sql/
 resumeee-storage-sql
 resumeee-auth-firebase/
 resumeee-auth-firebase
-resumeee-api/
-resumeee-api
+server/
+server
 resumeee-web/
 resumeee-web
 
