@@ -14,7 +14,7 @@ services:
       dockerfile: Dockerfile
       additional_contexts:
         core: ./core
-        resumeee-storage-sql: ./resumeee-storage-sql
+        sql: ./sql
         resumeee-auth-firebase: ./resumeee-auth-firebase
     image: resumeee:latest
     container_name: resumeee-server

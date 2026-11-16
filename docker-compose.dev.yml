@@ -21,7 +21,7 @@ services:
       - ./go.work:/workspace/go.work:ro
       - ./.air.server.toml:/workspace/.air.server.toml:ro
       - ./core:/workspace/core
-      - ./resumeee-storage-sql:/workspace/resumeee-storage-sql
+      - ./sql:/workspace/sql
       - ./resumeee-auth-firebase:/workspace/resumeee-auth-firebase
       - ./server:/workspace/server
       - go-mod-cache:/go
