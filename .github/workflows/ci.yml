@@ -1,0 +1,19 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate Compose configurations
+        run: |
+          docker compose config -q
+          docker compose -f docker-compose.yml -f docker-compose.dev.yml config -q
+      - name: Check helper script syntax
+        run: bash -n scripts/*.sh
