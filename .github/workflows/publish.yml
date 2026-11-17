@@ -1,0 +1,93 @@
+name: Publish Docker Images
+
+on:
+  push:
+    branches: [main]
+    tags:
+      - "v*"
+      - "0.*"
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  SERVER_IMAGE: ghcr.io/resumeee-app/resumeee-server
+  WEB_IMAGE: ghcr.io/resumeee-app/resumeee-web
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Clone child repositories
+        run: |
+          ./scripts/clone-all.sh
+          if [ "${{ github.ref_type }}" = "tag" ]; then
+            for repo in core sql server web; do
+              if git -C "$repo" rev-parse -q --verify "refs/tags/${{ github.ref_name }}" >/dev/null; then
+                git -C "$repo" checkout "${{ github.ref_name }}"
+              fi
+            done
+          fi
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata for server
+        id: meta-server
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.SERVER_IMAGE }}
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=ref,event=tag
+            type=sha,prefix=sha-
+
+      - name: Build and push server image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./server
+          file: ./server/Dockerfile
+          build-contexts: |
+            core=./core
+            sql=./sql
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta-server.outputs.tags }}
+          labels: ${{ steps.meta-server.outputs.labels }}
+          cache-from: type=gha,scope=server
+          cache-to: type=gha,mode=max,scope=server
+
+      - name: Extract metadata for web
+        id: meta-web
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.WEB_IMAGE }}
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=ref,event=tag
+            type=sha,prefix=sha-
+
+      - name: Build and push web image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./web
+          file: ./web/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta-web.outputs.tags }}
+          labels: ${{ steps.meta-web.outputs.labels }}
+          cache-from: type=gha,scope=web
+          cache-to: type=gha,mode=max,scope=web
