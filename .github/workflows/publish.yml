@@ -10,6 +10,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
+  APP_IMAGE: ghcr.io/resumeee-app/resumeee
   SERVER_IMAGE: ghcr.io/resumeee-app/server
   WEB_IMAGE: ghcr.io/resumeee-app/web
 
@@ -44,6 +45,28 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata for resumeee
+        id: meta-app
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.APP_IMAGE }}
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=ref,event=tag
+            type=sha,prefix=sha-
+
+      - name: Build and push resumeee image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta-app.outputs.tags }}
+          labels: ${{ steps.meta-app.outputs.labels }}
+          cache-from: type=gha,scope=app
+          cache-to: type=gha,mode=max,scope=app
 
       - name: Extract metadata for server
         id: meta-server
