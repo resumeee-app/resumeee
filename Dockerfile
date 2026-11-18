@@ -50,20 +50,22 @@ RUN CGO_ENABLED=1 go build \
 FROM nginx:alpine AS runtime
 
 RUN apk add --no-cache ca-certificates tzdata curl mailcap && \
+    addgroup -g 10001 -S appgroup && \
+    adduser -u 10001 -S appuser -G appgroup && \
     sed -i '/user  nginx;/d' /etc/nginx/nginx.conf && \
     sed -i 's,/run/nginx.pid,/tmp/nginx.pid,g' /etc/nginx/nginx.conf && \
     sed -i '/include \/etc\/nginx\/conf.d\/\*\.conf;/i \
     client_body_temp_path /tmp/client_temp;\n    proxy_temp_path /tmp/proxy_temp_path;\n    fastcgi_temp_path /tmp/fastcgi_temp;\n    uwsgi_temp_path /tmp/uwsgi_temp;\n    scgi_temp_path /tmp/scgi_temp;\n' /etc/nginx/nginx.conf && \
     rm -rf /etc/nginx/conf.d/* && \
     mkdir -p /data /var/cache/nginx /var/log/nginx /usr/share/nginx/html /tmp/client_temp /tmp/proxy_temp_path /tmp/fastcgi_temp /tmp/uwsgi_temp /tmp/scgi_temp && \
-    chown -R nginx:nginx /data /var/cache/nginx /var/log/nginx /usr/share/nginx/html /tmp
+    chown -R 10001:10001 /data /var/cache/nginx /var/log/nginx /usr/share/nginx/html /tmp
 
 # Copy NGINX configuration and point /api/ proxy to local Go backend on 127.0.0.1:8081
 COPY web/deploy/security_headers.conf /etc/nginx/security_headers.conf
 COPY web/deploy/nginx.conf /etc/nginx/conf.d/default.conf
 RUN sed -i '/resolver /d' /etc/nginx/conf.d/default.conf && \
     sed -i 's,http://server:8080,http://127.0.0.1:8081,g' /etc/nginx/conf.d/default.conf && \
-    chown -R nginx:nginx /etc/nginx/conf.d /etc/nginx/security_headers.conf
+    chown -R 10001:10001 /etc/nginx/conf.d /etc/nginx/security_headers.conf
 
 # Copy compiled Web SPA assets and Go binaries
 COPY --from=web-builder /web/dist /usr/share/nginx/html
@@ -72,7 +74,7 @@ COPY --from=server-builder /bin/resumeee-mcp /usr/local/bin/resumeee-mcp
 
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh && \
-    chown -R nginx:nginx /usr/share/nginx/html
+    chown -R 10001:10001 /usr/share/nginx/html
 
 WORKDIR /data
 
@@ -82,7 +84,7 @@ ENV DB_PATH=/data/resumeee.db \
     ENV=production \
     LOG_LEVEL=INFO
 
-USER nginx
+USER 10001:10001
 
 EXPOSE 8080
 
