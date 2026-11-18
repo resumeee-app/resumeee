@@ -1,9 +1,9 @@
 # Development image: Go toolchain + air (live reload). Workspace modules are bind-mounted at /workspace.
 FROM golang:1.27-alpine
 
-RUN apk add --no-cache git ca-certificates tzdata curl
+RUN apk add --no-cache git ca-certificates tzdata curl gcc musl-dev
 
-ENV GOPATH=/go GOCACHE=/gocache GOFLAGS=-buildvcs=false GOWORK=/workspace/go.work
+ENV CGO_ENABLED=1 GOPATH=/go GOCACHE=/gocache GOFLAGS=-buildvcs=false GOWORK=/workspace/go.work
 RUN mkdir -p /go /gocache /data /workspace \
     && GOBIN=/usr/local/bin go install github.com/air-verse/air@latest \
     # Make everything world-writable *after* the root-run install so the container

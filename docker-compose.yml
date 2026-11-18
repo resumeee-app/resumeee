@@ -12,10 +12,7 @@ services:
     build:
       context: ./server
       dockerfile: Dockerfile
-      additional_contexts:
-        core: ./core
-        sql: ./sql
-    image: ghcr.io/resumeee-app/resumeee-server:latest
+    image: ghcr.io/resumeee-app/server:latest
     container_name: resumeee-server
     command: ["server"]
     restart: unless-stopped
@@ -66,7 +63,7 @@ services:
       args:
         VITE_API_BASE_URL: ${VITE_API_BASE_URL:-/api/v1}
         ADMIN_MODE: ${ADMIN_MODE:-true}
-    image: ghcr.io/resumeee-app/resumeee-web:latest
+    image: ghcr.io/resumeee-app/web:latest
     container_name: resumeee-web
     restart: unless-stopped
     ports:

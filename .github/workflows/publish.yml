@@ -10,8 +10,8 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  SERVER_IMAGE: ghcr.io/resumeee-app/resumeee-server
-  WEB_IMAGE: ghcr.io/resumeee-app/resumeee-web
+  SERVER_IMAGE: ghcr.io/resumeee-app/server
+  WEB_IMAGE: ghcr.io/resumeee-app/web
 
 jobs:
   publish:
@@ -60,9 +60,6 @@ jobs:
         with:
           context: ./server
           file: ./server/Dockerfile
-          build-contexts: |
-            core=./core
-            sql=./sql
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta-server.outputs.tags }}

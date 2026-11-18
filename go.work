@@ -6,6 +6,6 @@ use (
 	./sql
 )
 
-replace github.com/resumeee-app/core v0.0.0-20261116055334-268b7be87011 => ./core
+replace github.com/resumeee-app/core v0.0.1 => ./core
 
-replace github.com/resumeee-app/sql v0.0.0-20261116061314-f526b63092a4 => ./sql
+replace github.com/resumeee-app/sql v0.0.1 => ./sql
