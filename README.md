@@ -21,19 +21,40 @@ This repository (`github.com/resumeee-app/resumeee`) is the workspace and Docker
 
 ## Quickstart
 
-### 1. Clone Child Repositories & Configure Environment
+### Option A: Single Docker Container (Prebuilt Image)
+
+Run the unified container (Web SPA + REST API + SQLite persistence in `/data`):
 
 ```bash
+docker run -p 8080:8080 -p 8081:8081 -v resumeee-data:/data \
+  -e GEMINI_API_KEY=your_api_key \
+  ghcr.io/resumeee-app/resumeee:latest
+```
+
+- **Web UI**: [http://localhost:8080](http://localhost:8080)
+- **REST API (via NGINX proxy)**: [http://localhost:8080/api/v1](http://localhost:8080/api/v1)
+- **REST API (direct backend port)**: [http://localhost:8081/api/v1](http://localhost:8081/api/v1)
+- **Health Check**: `curl http://localhost:8080/api/v1/health`
+
+*(Optional: pass `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, or `OPENAI_COMPAT_BASE_URL` via `-e`. Separate service images are also published at `ghcr.io/resumeee-app/server:latest` and `ghcr.io/resumeee-app/web:latest`.)*
+
+### Option B: Clone & Run from Source (Docker Compose)
+
+#### 1. Clone Child Repositories & Configure Environment
+
+```bash
+git clone https://github.com/resumeee-app/resumeee.git
+cd resumeee
 ./scripts/clone-all.sh
 cp .env.example .env
 # Add your GEMINI_API_KEY, OPENAI_API_KEY, or ANTHROPIC_API_KEY to .env
 ```
 
-### 2. Run Full Stack (Docker Compose)
+#### 2. Build & Run Full Stack (Docker Compose)
 
 ```bash
-docker compose up -d --build
-# or: make up
+docker compose up --build
+# or detached: make up
 ```
 
 - **Web UI**: [http://localhost:3000](http://localhost:3000)
@@ -47,25 +68,32 @@ docker compose down
 # or: make down
 ```
 
-### 3. Run Development Stack (Live Reload)
+#### 3. Run Manually Without Docker (or Dev Stack)
 
-Runs Go live-reload alongside Vite HMR:
+Run the Go live-reload + Vite HMR development stack via Docker:
 
 ```bash
 make dev
 ```
 
-- **Web UI (Vite HMR)**: [http://localhost:5173](http://localhost:5173)
-- **REST API**: [http://localhost:8080/api/v1](http://localhost:8080/api/v1)
-
-### 4. Optional Local LLM (Ollama)
+Or run the Go API server (`:8080`) and React SPA (`:5173`) directly on your host:
 
 ```bash
-docker compose --profile local-llm up -d --build
+PORT=8080 ADMIN_MODE=true go -C server run ./cmd/server
+npm --prefix web install && npm --prefix web run dev
+```
+
+- **Web UI (Vite)**: [http://localhost:5173](http://localhost:5173)
+- **REST API**: [http://localhost:8080/api/v1](http://localhost:8080/api/v1)
+
+#### 4. Optional Local LLM (Ollama)
+
+```bash
+docker compose --profile local-llm up --build
 docker exec -it resumeee-ollama ollama pull llama3.3
 ```
 
-### 5. Run Workspace Tests
+#### 5. Run Workspace Tests
 
 ```bash
 make test-all

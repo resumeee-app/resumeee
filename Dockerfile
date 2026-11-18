@@ -86,7 +86,7 @@ ENV DB_PATH=/data/resumeee.db \
 
 USER 10001:10001
 
-EXPOSE 8080
+EXPOSE 8080 8081
 
 VOLUME ["/data"]
 
