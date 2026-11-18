@@ -11,5 +11,9 @@ coverage.out
 .env
 core
 sql
-server
-web
+server/.git
+web/.git
+web/node_modules
+web/dist
+web/dist-landing
+web/coverage
